@@ -25,7 +25,7 @@ class User extends BaseController {
         } = req.body;
 
         const dup = data.find(e => e.email === email);
-        if (!dup) {
+        if (dup) {
             return super.responseInputError(resp, 'Email already registered.');
         }
 

@@ -21,11 +21,11 @@ class Employer extends BaseController {
 
     async register (req, resp) {
         const {
-            email, firstName, lastName,  company, location
+            email, firstName, lastName, company, location
         } = req.body;
 
         const dup = data.find(e => e.email === email);
-        if (!dup) {
+        if (dup) {
             return super.responseInputError(resp, 'Email already registered.');
         }
 
