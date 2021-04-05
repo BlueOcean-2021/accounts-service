@@ -1,16 +1,17 @@
-import data from '../tests/employers.json';
 import BaseController from './base';
+import Employer from '../models/employers';
+import Auth, { AccountTypes } from '../models/auth';
 
-class Employer extends BaseController {
+class EmployerController extends BaseController {
     async list (req, resp) {
-        const employers = data;
+        const employers = await Employer.find({}); // TBD
 
         super.responseOk(resp, employers);
     }
 
     async getById (req, resp) {
         const { id } = req.params;
-        const employer = data.find(e => e.id === id);
+        const employer = await Employer.findById(id);
 
         if (!employer) {
             return super.responseNotFound(resp);
@@ -21,18 +22,25 @@ class Employer extends BaseController {
 
     async register (req, resp) {
         const {
-            email, firstName, lastName, company, location
+            email, password, firstName, lastName, company, location
         } = req.body;
 
-        const dup = data.find(e => e.email === email);
+        const dup = await Employer.findByEmail(email);
         if (dup) {
             return super.responseInputError(resp, 'Email already registered.');
         }
 
-        const employer = {
-            id: '3001', email, firstName, lastName, company, location
-        };
-        super.responseOk(resp, employer);
+        const [employer, auth] = await Promise.all([
+            Employer.register({ email, firstName, lastName, location, company }),
+            Auth.signUp({ accountType: AccountTypes.Employer, email, password })
+        ]);
+
+        const accessToken = await auth.authenticate({ email, password })
+
+        super.responseOk(resp, {
+            ...employer.toJSON(),
+            accessToken
+        });
     }
 
     async updateProfile (req, resp) {
@@ -54,6 +62,6 @@ class Employer extends BaseController {
     }
 }
 
-const singleton = new Employer();
+const singleton = new EmployerController();
 
 export default singleton;
