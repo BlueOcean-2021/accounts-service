@@ -1,16 +1,18 @@
 import data from '../tests/users.json';
 import BaseController from './base';
+import User from '../models/users';
+import Auth, { AccountTypes } from '../models/auth';
 
-class User extends BaseController {
+class UserController extends BaseController {
     async list (req, resp) {
-        const users = data;
+        const users = await User.find({}); // tbd
 
         super.responseOk(resp, users);
     }
 
     async getById (req, resp) {
         const { id } = req.params;
-        const user = data.find(e => e.id === id);
+        const user = await User.findById(id);
 
         if (!user) {
             return super.responseNotFound(resp);
@@ -21,17 +23,17 @@ class User extends BaseController {
 
     async register (req, resp) {
         const {
-            email, firstName, lastName, location
+            email, firstName, lastName, location, password
         } = req.body;
 
-        const dup = data.find(e => e.email === email);
+        const dup = await User.findByEmail(email);
         if (dup) {
             return super.responseInputError(resp, 'Email already registered.');
         }
 
-        const user = {
-            id: '4001', email, firstName, lastName, location
-        };
+        const user = await User.register({ email, firstName, lastName, location });
+        const auth = await Auth.signUp({ accountType: AccountTypes.User, email, password });
+
         super.responseOk(resp, user);
     }
 
@@ -40,12 +42,12 @@ class User extends BaseController {
             email, firstName, lastName, location
         } = req.body;
 
-        const user = data.find(e => e.email === email);
+        const user = await User.findByEmail(email);
 
         if (!user) {
             return super.responseNotFound(resp);
         }
-
+        // tbd: update !!
         const updated = {
             ...user, firstName, lastName, location
         };
@@ -54,6 +56,6 @@ class User extends BaseController {
     }
 }
 
-const singleton = new User();
+const singleton = new UserController();
 
 export default singleton;

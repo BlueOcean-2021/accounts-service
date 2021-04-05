@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
-const axios = require('axios');
+const Utils = require('./utils');
 const data = require('./users.json');
-const Utils = require('./utils.js');
 
 const { getResponseOK } = Utils;
-const baseUrl = 'http://localhost:4000/api/users';
 
-// beforeAll(Utils.beforeAll);
+const baseUrl = 'http://localhost:4001/api/users';
+
+beforeAll(Utils.beforeAll);
 
 test('list users', async () => {
     const resp = await getResponseOK(baseUrl);

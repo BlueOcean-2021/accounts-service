@@ -9,12 +9,10 @@ async function getResponseOK (url) {
     return resp;
 }
 
-function beforeAll () {
-    /*
-    const esImport = require('esm')(module);
-    const server = esImport('../server.js');
-    */
-    const server = require('../server.js');
+async function beforeAll (done) {
+    const { startServer } = require('../server.js');
+    await startServer();
+    done();
 }
 
 module.exports = {
