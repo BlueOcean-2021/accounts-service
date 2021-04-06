@@ -1,4 +1,4 @@
-import Mongoose from 'mongoose';
+import Mongoose, { ObjectId } from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Config from '../config';
@@ -33,15 +33,14 @@ class AuthClass {
     }
 
     async authenticate (credentials) {
-        const user = this.accountType === AccountTypes.User
-            ? await User.findByEmail(this.email) : null;
-        const employer = this.accountType === AccountTypes.User
-            ? await Employer.findByEmail(this.email) : null;
+        const user = this.accountType === AccountTypes.User ? await User.findByEmail(this.email) : null;
+        const employer = this.accountType === AccountTypes.Employer ? await Employer.findByEmail(this.email) : null;
+
         if (bcrypt.compare(credentials.password, this.password)) {
             const accessToken = await this.generateAccessToken({
                 accountType: this.accountType,
-                employerId: employer && employer.id,
-                userId: user && user.id
+                employerId: employer && employer._id,
+                userId: user && user._id
             });
             return accessToken;
         }
@@ -81,7 +80,6 @@ class AuthClass {
 
 const schema = Mongoose.Schema(
     {
-        id: Mongoose.Types.ObjectId,
         email: {
             type: String,
             required: true,
