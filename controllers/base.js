@@ -1,4 +1,10 @@
+import { ObjectId } from 'bson';
+
 export default class BaseController {
+    isValidObjectId (objectId) {
+        return ObjectId.isValid(objectId);
+    }
+
     responseOk (resp, data) {
         resp.status(200).send({
             ok: true,

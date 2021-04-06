@@ -18,7 +18,6 @@ class UserClass {
 
 const schema = Mongoose.Schema(
     {
-        id: Mongoose.Types.ObjectId,
         email: {
             type: String,
             required: true,

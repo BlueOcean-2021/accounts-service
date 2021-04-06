@@ -1,4 +1,3 @@
-import data from '../tests/users.json';
 import BaseController from './base';
 import User from '../models/users';
 import Auth, { AccountTypes } from '../models/auth';
@@ -12,6 +11,8 @@ class UserController extends BaseController {
 
     async getById (req, resp) {
         const { id } = req.params;
+        if (!super.isValidObjectId(id)) super.responseInputError(resp);
+
         const user = await User.findById(id);
 
         if (!user) {
@@ -31,10 +32,16 @@ class UserController extends BaseController {
             return super.responseInputError(resp, 'Email already registered.');
         }
 
-        const user = await User.register({ email, firstName, lastName, location });
-        const auth = await Auth.signUp({ accountType: AccountTypes.User, email, password });
+        const [user, auth] = await Promise.all([
+            User.register({ email, firstName, lastName, location }),
+            Auth.signUp({ accountType: AccountTypes.User, email, password })
+        ]);
+        const accessToken = await auth.authenticate({ email, password });
 
-        super.responseOk(resp, user);
+        super.responseOk(resp, {
+            ...user.toJSON(),
+            accessToken
+        });
     }
 
     async updateProfile (req, resp) {

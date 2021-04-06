@@ -11,6 +11,8 @@ class EmployerController extends BaseController {
 
     async getById (req, resp) {
         const { id } = req.params;
+        if (!super.isValidObjectId(id)) super.responseInputError(resp);
+
         const employer = await Employer.findById(id);
 
         if (!employer) {
@@ -35,7 +37,7 @@ class EmployerController extends BaseController {
             Auth.signUp({ accountType: AccountTypes.Employer, email, password })
         ]);
 
-        const accessToken = await auth.authenticate({ email, password })
+        const accessToken = await auth.authenticate({ email, password });
 
         super.responseOk(resp, {
             ...employer.toJSON(),
