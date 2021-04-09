@@ -48,4 +48,19 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Deployment
+        run: |
+          docker -H $TARGET_HOST:$TARGET_PORT rm -f accounts-api
+          docker -H $TARGET_HOST:$TARGET_PORT pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker -H $TARGET_HOST:$TARGET_PORT run --name accounts-api -d -p 4000:4000 -e $APP_SECRET -e $DB_URL $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        env:
+          TARGET_HOST: 18.220.13.101
+          TARGET_PORT: 2375
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          ECR_REPOSITORY: accounts-api
+          IMAGE_TAG: '1.0'
+          APP_SECRET: ${{ secrets.APP_SECRET }}
+          DB_URL: ${{ secrets.DB_URL }}
+
+
 
