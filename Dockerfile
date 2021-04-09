@@ -1,11 +1,10 @@
-
 #FROM arm64v8/node:lts-alpine
-#FROM node:lts-alpine
-#RUN apk add --no-cache build-base
-FROM arm64v8/node:lts-buster
+FROM node:lts-buster
 
 WORKDIR /app
 COPY . .
+
+EXPOSE 4000
 
 RUN yarn install --frozen-lockfile
 
