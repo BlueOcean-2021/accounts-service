@@ -42,7 +42,7 @@ jobs:
       - name: Docker build and push
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          ECR_REPOSITORY: service-api
+          ECR_REPOSITORY: accounts-api
           IMAGE_TAG: '1.0'
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
